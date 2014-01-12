@@ -1,0 +1,12 @@
+# MythTVArchiveServer Startup Script
+#
+
+description "MythTVArchiveServer"
+
+start on started networking
+stop on runlevel [016]
+
+script
+        su - mythtv -c 'exec /usr/bin/twistd -d --uid=mythtv --gid=mythtv MythTVArchiveServer'
+end script
+

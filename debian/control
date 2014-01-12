@@ -1,0 +1,17 @@
+Source: mythtvarchiveserver
+Maintainer: Nathan Lewis <natewlew@gmail.com>
+Section: python
+Priority: optional
+Build-Depends: python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 7)
+Standards-Version: 3.9.1
+
+Package: mythtvarchiveserver
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, python-dateutil
+Description: Application used to archive mythtv recordings on a remote host using handbrake.
+
+Package: mythtvarchiveservermedia
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, mythtvarchiveserver
+Description: Web based media viewer and manager for MythTVArchiveServer.
+

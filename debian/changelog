@@ -1,0 +1,11 @@
+mythtvarchiveserver (0.1-2) unstable; urgency=low
+
+  * Refactored to add controllers
+
+ -- Nathan Lewis <natewlew@gmail.com>  Mon, 16 Dec 2013 20:30:00 -0600
+
+mythtvarchiveserver (0.1-1) unstable; urgency=low
+
+  * source package automatically created by stdeb 0.6.0+git
+
+ -- Nathan Lewis <natewlew@gmail.com>  Sat, 14 Dec 2013 14:29:27 -0600
