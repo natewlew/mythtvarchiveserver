@@ -28,7 +28,7 @@ class QueueResource(BaseDB):
 
         server_url = 'http://localhost:%s' % site_registry().config.server_port
         retry_response = process_archive(server_url, request)
-        delete_response = process_delete(request)
+        delete_response = process_delete(request, self.recordings.get_recording)
 
         queues = session.query(Queue)\
                     .order_by(Queue.created.desc())\

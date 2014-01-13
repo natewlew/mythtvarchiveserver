@@ -6,7 +6,6 @@
 """
 
 from MythTVArchiveServer.util.clienthelper import archive_recording
-from MythTVArchiveServer.lib.recordedshows import Recordings
 
 def process_archive(server_url, request):
     """ Process Archive
@@ -23,7 +22,7 @@ def process_archive(server_url, request):
     except (ValueError, TypeError):
         return ''
 
-def process_delete(request):
+def process_delete(request, get_recording_method):
     """ Process Delete
     Process a delete request.
     @param: request: Twisted Resource Request
@@ -32,8 +31,7 @@ def process_delete(request):
         delete = int(request.args.get('delete', [''])[0])
         chan_id = int(request.args.get('chan_id', [''])[0])
         start_time = request.args.get('start_time', [''])[0]
-        recordings = Recordings()
-        program = recordings.get_recording(chan_id, start_time)
+        program = get_recording_method(chan_id, start_time)
         if program:
             result = program.delete()
             if result == -1:

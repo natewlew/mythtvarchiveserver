@@ -15,6 +15,8 @@ from sqlalchemy import event
 from sqlalchemy.pool import Pool
 from twisted.internet import reactor
 
+from MythTV import MythBE
+
 _site_registry = None
 Base = declarative_base()
 
@@ -67,6 +69,8 @@ class RegistryController(object):
         self._archive = None
         self._queue = None
 
+        self._mythbe = MythBE()
+
         if skip_controllers is True:
             self.close_session()
         else:
@@ -104,6 +108,10 @@ class RegistryController(object):
     @property
     def session(self):
         return self._session
+
+    @property
+    def mythbe(self):
+        return self._mythbe
 
     @property
     def queue(self):

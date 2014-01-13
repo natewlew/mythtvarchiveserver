@@ -7,7 +7,6 @@
 
 from MythTV import Recorded
 
-from MythTVArchiveServer.lib.recordedshows import Recordings
 from MythTVArchiveServer.util.webhelper import build_paginate_links, default_template, process_archive,\
                                                build_archive_link, build_delete_link, process_delete
 from MythTVArchiveServer.controllers.registry import site_registry
@@ -19,6 +18,7 @@ class RecordingsResource(BaseDB):
     """
     Used to display the MythTV recordings.
     """
+
     def get_queue(self, session, program):
 
         start_time_to_utc = mythdate_to_str(program.starttime)
@@ -48,9 +48,9 @@ class RecordingsResource(BaseDB):
 
         server_url = 'http://localhost:%s' % site_registry().config.server_port
         archive_response = process_archive(server_url, request)
-        delete_response = process_delete(request)
+        delete_response = process_delete(request, self.recordings.get_recording)
 
-        recording_list = Recordings().get_recordings()
+        recording_list = self.recordings.get_recordings()
 
         session = site_registry().session
 

@@ -5,7 +5,6 @@
 
 """
 
-from MythTV import MythBE
 from dateutil import parser
 
 from MythTVArchiveServer.controllers.registry import site_registry
@@ -17,7 +16,7 @@ class Recordings(object):
     def __init__(self):
         self.log = site_registry().log
         self.config = site_registry().config
-        self.be = MythBE()
+        self.be = site_registry().mythbe
 
     def get_recording(self, chan_id, start_time):
         try:

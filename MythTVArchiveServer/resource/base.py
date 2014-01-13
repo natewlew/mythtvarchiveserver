@@ -7,6 +7,7 @@
 
 from twisted.web.resource import Resource
 from MythTVArchiveServer.controllers.registry import site_registry
+from MythTVArchiveServer.lib.recordedshows import Recordings
 
 
 def manage_session(meth):
@@ -22,6 +23,11 @@ def manage_session(meth):
 
 
 class BaseDB(Resource):
+
+    def __init__(self):
+        Resource.__init__(self)
+
+        self.recordings = Recordings()
 
     @manage_session
     def render_GET(self, request):
