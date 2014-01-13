@@ -1,6 +1,8 @@
 # MythTVArchiveServer Install
 
-Requirements: MythTV, Twisted, SqlAlchemy, MySQLdb, python-dateutil
+Requirements: MythTV, Twisted, SqlAlchemy, MySQLdb, python-dateutil, HandBrake-cli
+
+Currently only tested with Ubuntu 12.04.
 
 - Run `build.sh deb` to build the debian package
 - Install the packages
@@ -10,4 +12,4 @@ Requirements: MythTV, Twisted, SqlAlchemy, MySQLdb, python-dateutil
 
 - Create the MythTV [Userjob](http://www.mythtv.org/wiki/User_Jobs) (Optional)
 
-    The user job will point to the [mythtvarchive.py](MythTVArchiveServer/client/mythtvarchive.py) file. Install this file to your MythTV Backend Server at `/opt/mythtv`. Make the file permissions executable. Then create the user job with this as the parameter: `/opt/mythtv/mythtvarchive.py %CHANID% %STARTTIMEISOUTC%`.
+    The user job will point to the [mythtvarchive.py](client/mythtvarchive.py) file. Install this file to your MythTV Backend Server at `/opt/mythtv`. Make the file permissions executable. Then create the user job with this as the parameter: `/opt/mythtv/mythtvarchive.py %CHANID% %STARTTIMEISOUTC%`.
