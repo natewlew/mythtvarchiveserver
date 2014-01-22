@@ -9,7 +9,6 @@ import time
 from twisted.internet import defer
 from twisted.internet.task import LoopingCall
 from twisted.internet.threads import deferToThread
-from MythTV import Recorded
 from socket import gethostname
 
 from MythTVArchiveServer.lib.recordedshows import Recordings
@@ -78,13 +77,14 @@ class ArchiveController(object):
             else:
                 mpg_file = program.filename
 
+            rec = self.recordings.recorded_from_program(program)
+
             self.working_files.append(mpg_file)
             self.working_files.append('%s.tmp' % mpg_file)
             self.working_files.append('%s.tmp.map' % mpg_file)
             if mpg_file.endswith('.nuv'):
                 self.log.info('Not attempting to cut commercials on a nuv file')
             else:
-                rec = Recorded.fromProgram(program)
                 if rec.cutlist == 1:
                     yield self.transcode.cut_commercials(mpg_file, self.recorder)
                 else:
@@ -104,7 +104,7 @@ class ArchiveController(object):
             raise ArchiveError('Error handbrake transcode: %r' % e)
 
         try:
-            yield deferToThread(self.create_video, tmp_handbrake_file_path, program)
+            yield deferToThread(self.create_video, tmp_handbrake_file_path, rec, site_registry().mythdb)
         except Exception, e:
             import logging
             logging.exception(e)
@@ -151,15 +151,15 @@ class ArchiveController(object):
         working_file = '%s/%s' % (working_dir, file_name)
         return working_file
 
-    def create_video(self, file_, program):
+    def create_video(self, file_, recorded, db):
         """ Create Video
         Create the final archive video.
         @param: file_: String:
-        @param: program: Program: MythTV Program
+        @param: recorded: Recorded: MythTV Recorded
         """
         export_type = self.config.export_type
         ExportType.validate(export_type)
-        ExportVideo(file_, program, self.recorder, export_type)
+        ExportVideo(file_, recorded, self.recorder, db, export_type)
 
     @defer.inlineCallbacks
     def cleanup(self):

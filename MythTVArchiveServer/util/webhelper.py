@@ -37,7 +37,7 @@ def process_delete(request, get_recording_method):
             if result == -1:
                 result = 'Program was successfully deleted'
             else:
-                result = 'Could not delete program: %r' % result
+                result = 'Could not delete program: %r or Queued for later?' % result
         else:
             result = 'Could Not Find Program'
         return result

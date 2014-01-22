@@ -72,7 +72,15 @@ class ConfigController(object):
 
     @property
     def db_dsn(self):
-        return self.config.get('db', 'dsn')
+        return 'mysql://%s:%s@%s/%s' % (self.config.get('db', 'user'), self.config.get('db', 'pass'),
+                                        self.config.get('db', 'host'), self.config.get('db', 'name'))
+
+    @property
+    def db_args(self):
+        return (('DBHostName', self.config.get('db', 'host')),
+                 ('DBName',    self.config.get('db', 'name')),
+                 ('DBUserName',self.config.get('db', 'user')),
+                 ('DBPassword',self.config.get('db', 'pass')))
 
     @property
     def init_db(self):

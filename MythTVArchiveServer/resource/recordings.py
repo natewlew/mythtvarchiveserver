@@ -27,7 +27,7 @@ class RecordingsResource(BaseDB):
                     .order_by(Queue.created.desc())\
                     .limit(1).all()
         if not queue:
-            rec = Recorded.fromProgram(program)
+            rec = self.recordings.recorded_from_program(program)
             if rec:
                 if rec.cutlist == 1:
                     return 'Ready'

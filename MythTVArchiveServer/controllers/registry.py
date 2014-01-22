@@ -15,7 +15,7 @@ from sqlalchemy import event
 from sqlalchemy.pool import Pool
 from twisted.internet import reactor
 
-from MythTV import MythBE
+from MythTV import MythBE, MythDB
 
 _site_registry = None
 Base = declarative_base()
@@ -56,7 +56,13 @@ class RegistryController(object):
     def __init__(self, skip_controllers=False):
 
         self._config = ConfigController()
-        self._log = Log()
+
+        db_args = self._config.db_args
+
+        self._mythdb = MythDB(args=db_args)
+        self._mythbe = MythBE(db=self._mythdb)
+
+        self._log = Log(self._mythdb)
 
         self._base = None
         self._session = None
@@ -68,8 +74,6 @@ class RegistryController(object):
 
         self._archive = None
         self._queue = None
-
-        self._mythbe = MythBE()
 
         if skip_controllers is True:
             self.close_session()
@@ -114,12 +118,28 @@ class RegistryController(object):
         return self._mythbe
 
     @property
+    def mythdb(self):
+        return self._mythdb
+
+    @property
     def queue(self):
         return self._queue
 
     @property
     def archive(self):
         return self._archive
+
+    def mysql_gone_away(self, e):
+        try:
+            if e.args[0] == 2006:
+                self._mythdb.db.__del__()
+                self._mythdb.db._pool = []
+                self._mythdb.db._inuse = []
+                return True
+        except (IndexError, AttributeError):
+            pass
+        return False
+
 
 skip_controllers_ = os.environ.get('SKIP_CONTROLLERS', 'False') == 'True'
 _site_registry = RegistryController(skip_controllers=skip_controllers_)

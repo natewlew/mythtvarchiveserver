@@ -6,6 +6,8 @@
 """
 
 from dateutil import parser
+from MythTV import Recorded
+from MySQLdb.connections import OperationalError
 
 from MythTVArchiveServer.controllers.registry import site_registry
 
@@ -17,6 +19,7 @@ class Recordings(object):
         self.log = site_registry().log
         self.config = site_registry().config
         self.be = site_registry().mythbe
+        self.db = site_registry().mythdb
 
     def get_recording(self, chan_id, start_time):
         try:
@@ -25,6 +28,15 @@ class Recordings(object):
             return recording
         except Exception:
             pass
+
+    def recorded_from_program(self, program, recursive=False):
+        try:
+            return Recorded((program.chanid, program.recstartts), self.db)
+        except OperationalError, e:
+            if recursive is False:
+                if site_registry().mysql_gone_away(e):
+                    return self.recorded_from_program(program, recursive=True)
+            raise
 
     def get_recordings(self):
         try:

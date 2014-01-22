@@ -9,7 +9,7 @@ import time, os
 from re import sub
 from shutil import move
 
-from MythTV import Video, MythDB, VideoGrabber, Recorded, MythError
+from MythTV import Video, VideoGrabber, MythError
 from MythTVArchiveServer.lib.exceptions import ArchiveError
 from MythTVArchiveServer.controllers.registry import site_registry
 
@@ -50,10 +50,9 @@ class ExportVideo(object):
     This file would not have been possible without it.
     """
 
-    def __init__(self, file_, program, recorder, export_type=ExportType.mythvideo):
+    def __init__(self, file_, recorded, recorder, db, export_type=ExportType.mythvideo):
         self.file_ = file_
-        self.program = program
-        self.db = MythDB()
+        self.db = db
         self.recorder = recorder
         self.config = site_registry().config
 
@@ -64,7 +63,7 @@ class ExportVideo(object):
         else:
             raise ArchiveError('Invalid Export Type: %r' % export_type)
 
-        self.rec = Recorded.fromProgram(program)
+        self.rec = recorded
 
         self.log = site_registry().log
 
