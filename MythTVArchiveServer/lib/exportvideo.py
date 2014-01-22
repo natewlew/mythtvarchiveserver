@@ -204,7 +204,7 @@ class ExportVideo(object):
 
         fmt = fmt.replace(' ', '_')
         fmt = sub('[^0-9a-zA-Z_/-]+', '', fmt)
-        return '%s%s' % (fmt, self.ext)
+        return '%s.%s' % (fmt, self.ext)
 
     def write_file(self):
         """ Write File
