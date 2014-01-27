@@ -8,11 +8,8 @@
 import os
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import DisconnectionError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import event
-from sqlalchemy.pool import Pool
 from twisted.internet import reactor
 
 from MythTV import MythBE, MythDB
@@ -31,21 +28,6 @@ from MythTVArchiveServer.controllers.queue import QueueController
 from MythTVArchiveServer.controllers.archive import ArchiveController
 from MythTVArchiveServer.util.logger import Log
 
-
-@event.listens_for(Pool, "checkout")
-def ping_connection(dbapi_connection, connection_record, connection_proxy):
-    cursor = dbapi_connection.cursor()
-    try:
-        cursor.execute("SELECT 1")
-    except:
-        # optional - dispose the whole pool
-        # instead of invalidating one at a time
-        # connection_proxy._pool.dispose()
-
-        # raise DisconnectionError - pool will try
-        # connecting again up to three times before raising.
-        raise DisconnectionError()
-    cursor.close()
 
 class RegistryController(object):
     """

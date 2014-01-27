@@ -5,7 +5,6 @@
 
 """
 
-from MythTV import Recorded
 
 from MythTVArchiveServer.util.webhelper import build_paginate_links, default_template, process_archive,\
                                                build_archive_link, build_delete_link, process_delete
