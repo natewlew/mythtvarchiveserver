@@ -17,11 +17,22 @@ from MythTV import MythBE, MythDB
 _site_registry = None
 Base = declarative_base()
 
+
 def site_registry():
     """
     Global Access to the Registry Controller.
     """
     return _site_registry
+
+
+def init_registry(init_server=True):
+    """
+    Init the Registry
+    @param: init_server: Boolean: Init the Server Controllers
+    """
+    global _site_registry
+    _site_registry = RegistryController(init_server=init_server)
+
 
 from MythTVArchiveServer.controllers.config import ConfigController
 from MythTVArchiveServer.controllers.queue import QueueController
@@ -35,7 +46,7 @@ class RegistryController(object):
     common objects in the application.
     """
 
-    def __init__(self, skip_controllers=False):
+    def __init__(self, init_server=True):
 
         self._config = ConfigController()
 
@@ -57,10 +68,10 @@ class RegistryController(object):
         self._archive = None
         self._queue = None
 
-        if skip_controllers is True:
-            self.close_session()
+        if init_server is True:
+            reactor.callLater(1, self._init_controllers)
         else:
-           reactor.callLater(1, self._init_controllers)
+            self.close_session()
 
     def _init_controllers(self):
         self.log.info('Init Controllers')
@@ -121,8 +132,3 @@ class RegistryController(object):
         except (IndexError, AttributeError):
             pass
         return False
-
-
-skip_controllers_ = os.environ.get('SKIP_CONTROLLERS', 'False') == 'True'
-_site_registry = RegistryController(skip_controllers=skip_controllers_)
-

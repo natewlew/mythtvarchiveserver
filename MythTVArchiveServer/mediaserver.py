@@ -5,18 +5,20 @@
 
 """
 
+import os
+
 from twisted.web.server import Site
 from twisted.web.static import File
 from twisted.internet import reactor
 from twisted.web.resource import Resource
 
-import os
-os.environ['SKIP_CONTROLLERS'] = 'True'
-
 import MythTVArchiveServer.controllers.registry as registry
 from MythTVArchiveServer.controllers.registry import site_registry
 from MythTVArchiveServer.resource.queue import QueueResource
 from MythTVArchiveServer.resource.recordings import RecordingsResource
+
+
+registry.init_registry(init_server=False)
 
 
 class DefaultResource(Resource):

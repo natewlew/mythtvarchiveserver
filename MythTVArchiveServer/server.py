@@ -15,6 +15,9 @@ from MythTVArchiveServer.lib.recordedshows import Recordings
 from MythTVArchiveServer.lib.transcode import Quality
 
 
+registry.init_registry()
+
+
 class ArchiveServer(XMLRPC):
     """ Archive XMLRPC Server
     Used to add the MythTV recording to the Queue.
