@@ -1,1 +1,3 @@
+debian/tmp/usr/* /usr
+
 conf/* /etc/mythtvarchiveserver/
