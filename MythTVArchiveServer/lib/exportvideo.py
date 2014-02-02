@@ -158,7 +158,7 @@ class ExportVideo(object):
                                                        +self.rec.title)
                 else:
                     metadata = grab.grabInetref(match[0])
-        except MythError, e:
+        except (MythError, StopIteration), e:
             self.log.warning('Error Getting Metadata: %r' % e)
             metadata = self.rec.exportMetadata()
 

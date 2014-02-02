@@ -5,7 +5,7 @@
 
 """
 
-import time
+import time, logging
 from twisted.internet import defer
 from twisted.internet.task import LoopingCall
 from twisted.internet.threads import deferToThread
@@ -106,7 +106,6 @@ class ArchiveController(object):
         try:
             yield deferToThread(self.create_video, tmp_handbrake_file_path, rec, site_registry().mythdb)
         except Exception, e:
-            import logging
             logging.exception(e)
             raise ArchiveError('Create Video Error: %r' % e)
 
