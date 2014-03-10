@@ -20,7 +20,7 @@ class Queue(Base):
         super(Queue, self).__init__(**kwargs)
 
         self.chan_id = program.chanid
-        self.start_time = mythdate_to_str(program.starttime)
+        self.start_time = mythdate_to_str(program.recstartts)
         self.quality = quality
         self.queued = True
         self.created = datetime.now()

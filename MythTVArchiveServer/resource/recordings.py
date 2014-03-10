@@ -7,7 +7,8 @@
 
 
 from MythTVArchiveServer.util.webhelper import build_paginate_links, default_template, process_archive,\
-                                               build_archive_link, build_delete_link, process_delete
+                                               build_archive_link, build_delete_link, process_delete, build_checkbox, \
+                                               default_params
 from MythTVArchiveServer.controllers.registry import site_registry
 from MythTVArchiveServer.resource.base import BaseDB
 from MythTVArchiveServer.models.queue import Queue
@@ -20,7 +21,7 @@ class RecordingsResource(BaseDB):
 
     def get_queue(self, session, program):
 
-        start_time_to_utc = mythdate_to_str(program.starttime)
+        start_time_to_utc = mythdate_to_str(program.recstartts)
         queue = session.query(Queue)\
                     .filter(Queue.chan_id==program.chanid, Queue.start_time==start_time_to_utc)\
                     .order_by(Queue.created.desc())\
@@ -40,10 +41,16 @@ class RecordingsResource(BaseDB):
 
     def custom_render(self, request):
 
+        _default_params = default_params(['page', 'storage', 'status'], request.args)
+
         quality = 'Universal'
         page = request.args.get('page', [0])[0]
-        page, paginate_links = build_paginate_links(page, 'recordings')
+        page, paginate_links = build_paginate_links(page, 'recordings',
+                                                    default_params(['storage', 'status'], request.args))
         rows = 15
+
+        storage = request.args.get('storage', [[]])[0]
+        status = request.args.get('status', [[]])[0]
 
         server_url = 'http://localhost:%s' % site_registry().config.server_port
         archive_response = process_archive(server_url, request)
@@ -53,6 +60,24 @@ class RecordingsResource(BaseDB):
 
         session = site_registry().session
 
+        prune = []
+
+        if storage:
+            for program in recording_list:
+                if not program.storagegroup in storage:
+                    prune.append(program)
+
+        if status:
+            for program in recording_list:
+                queue_status = self.get_queue(session, program)
+                if not queue_status in status:
+                    prune.append(program)
+                else:
+                    program.queue_status = queue_status
+
+        if prune:
+            for program in prune:
+                recording_list.remove(program)
 
         chunks = []
         start = rows * page
@@ -66,11 +91,32 @@ class RecordingsResource(BaseDB):
                           % (program.title, program.subtitle if program.subtitle else '',
                              program.season, program.episode, program.inetref, program.category, program.storagegroup,
                              program.description[0:80] if program.description else ''))
-            archive_link = build_archive_link(program.chanid, str(program.starttime.utcisoformat()),
-                                              quality, 'recordings')
-            delete_link = build_delete_link(program.chanid, str(program.recstartts.utcisoformat()), 'recordings')
-            queue_status = self.get_queue(session, program)
+            archive_link = build_archive_link(program.chanid, str(program.recstartts.utcisoformat()),
+                                              quality, 'recordings', _default_params)
+            delete_link = build_delete_link(program.chanid, str(program.recstartts.utcisoformat()), 'recordings',
+                                            _default_params)
+
+            if status:
+                queue_status = program.queue_status
+            else:
+                queue_status = self.get_queue(session, program)
+
             chunks.append('<td>%s</td><td>%s</td><td>%s</td><tr>\n' % (queue_status, archive_link, delete_link))
+
+        storage_values = {
+            'LiveTV': 'LiveTV',
+            'Default': 'Default',
+        }
+        storage_checkbox = build_checkbox('storage', storage_values, storage)
+
+        status_values = {
+            'n/a': 'n/a',
+            'Ready': 'ready',
+            'Queued': 'queued',
+            'finished': 'finished',
+            'error': 'error',
+        }
+        status_checkbox = build_checkbox( 'status', status_values, status)
 
         content = '''
         %s%s
@@ -79,6 +125,18 @@ class RecordingsResource(BaseDB):
         <td>
         %s
         <a href="recordings">Refresh</a>
+        </td>
+        <td>
+        <form action="recordings">
+        <table>
+        <tr>
+        <td><b>Storage:</b></td><td>%s</td>
+        <td><b>Status:</b></td><td>%s</td>
+        <td><input type="submit" value="Submit"></td>
+        </tr>
+        </table>
+        <input type="hidden" name="page" value="%d">
+        </form>
         </td>
         </tr>
         </table>
@@ -89,6 +147,7 @@ class RecordingsResource(BaseDB):
         </tr>
         %s
         </table>
-        ''' % (archive_response, delete_response, paginate_links, ''.join(chunks))
+        ''' % (archive_response, delete_response, paginate_links, storage_checkbox, status_checkbox, page,
+               ''.join(chunks))
 
         return default_template(content)

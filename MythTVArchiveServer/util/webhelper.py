@@ -44,7 +44,7 @@ def process_delete(request, get_recording_method):
     except (ValueError, TypeError):
         return ''
 
-def build_archive_link(chan_id, start_time, quality, url):
+def build_archive_link(chan_id, start_time, quality, url, default_url=''):
     """ Build Archive Link
     @param: chan_id: String: Channel ID
     @param: start_time: String: Program Start Time
@@ -53,10 +53,10 @@ def build_archive_link(chan_id, start_time, quality, url):
     """
     start_time_str = '%sZ' % str(start_time).replace(' ', 'T')
     on_click = 'onclick="return confirm(\'Are you sure want to Archive this MythTV Recording?\');"'
-    return '<a href="%s?archive=1&chan_id=%s&start_time=%s&quality=%s" %s>Archive</a>'\
-           % (url, chan_id, start_time_str, quality, on_click)
+    return '<a href="%s?archive=1&chan_id=%s&start_time=%s&quality=%s&%s" %s>Archive</a>'\
+           % (url, chan_id, start_time_str, quality, default_url, on_click)
 
-def build_delete_link(chan_id, start_time, url):
+def build_delete_link(chan_id, start_time, url, default_url=''):
     """ Build Delete Link
     @param: chan_id: String: Channel ID
     @param: start_time: String: Program Start Time
@@ -64,9 +64,30 @@ def build_delete_link(chan_id, start_time, url):
     """
     start_time_str = '%sZ' % str(start_time).replace(' ', 'T')
     on_click = 'onclick="return confirm(\'Are you sure want to Delete this original MythTV Recording?\');"'
-    return '<a href="%s?delete=1&chan_id=%s&start_time=%s" %s>Delete</a>' % (url, chan_id, start_time_str, on_click)
+    return '<a href="%s?delete=1&chan_id=%s&start_time=%s&%s" %s>Delete</a>' % (url, chan_id, start_time_str,
+                                                                                     default_url, on_click)
 
-def build_paginate_links(page, url):
+def build_checkbox(name, values, selected):
+
+    form = []
+    for key, value in values.iteritems():
+        checked = 'checked' if key in selected else ''
+        form.append('<input type="checkbox" name="%s" value="%s" %s>%s\n' % (name, key, checked, value))
+    return ''.join(form)
+
+
+def default_params(params, args):
+    url = []
+    for param in params:
+        try:
+            for arg in args[param]:
+                url.append('%s=%s' % (param, arg))
+        except KeyError:
+            pass
+    return '&'.join(url)
+
+
+def build_paginate_links(page, url, default_url=''):
     """ Build Paginate Links
     Helper used to build Paginate Links.
     @param: page: Page Number
@@ -81,10 +102,10 @@ def build_paginate_links(page, url):
     next_page = page + 1
 
     links = '''
-    <a href="%s?page=0">First</a>
-    <a href="%s?page=%d">Previous</a>
-    </td><td><a href="%s?page=%d">Next</a>
-    ''' % (url, url, previous_page, url, next_page)
+    <a href="%s?page=0&%s">First</a>
+    <a href="%s?page=%d&%s">Previous</a>
+    </td><td><a href="%s?page=%d&%s">Next</a>
+    ''' % (url, default_url, url, previous_page, default_url, url, next_page, default_url)
 
     return page, links
 

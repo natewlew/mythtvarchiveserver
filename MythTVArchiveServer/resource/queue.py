@@ -49,15 +49,15 @@ class QueueResource(BaseDB):
                     # Job Errored
                     status_msg = 'Error: %s' % status.message
                     row_css = ' style="background-color: #FFB2B2"'
-                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, 'queue')
+                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, page, 'queue')
 
                 if starttime and endtime:
                     # Job Finished Successfully
                     runtime = endtime - starttime
                     status_msg = 'Job Time: %s' % runtime
                     row_css = ' style="background-color: #D4FFA9"'
-                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, 'queue')
-                    delete_link = build_delete_link(queue.chan_id, queue.start_time, 'recordings')
+                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, page, 'queue')
+                    delete_link = build_delete_link(queue.chan_id, queue.start_time, page, 'recordings')
 
             if status_msg is None and starttime is None:
                 # Hasn't Started Yet
