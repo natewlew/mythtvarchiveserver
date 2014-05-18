@@ -49,8 +49,8 @@ class RecordingsResource(BaseDB):
                                                     default_params(['storage', 'status'], request.args))
         rows = 15
 
-        storage = request.args.get('storage', [[]])[0]
-        status = request.args.get('status', [[]])[0]
+        storage = request.args.get('storage', [])
+        status = request.args.get('status', [])
 
         server_url = 'http://localhost:%s' % site_registry().config.server_port
         archive_response = process_archive(server_url, request)
@@ -112,6 +112,7 @@ class RecordingsResource(BaseDB):
         status_values = {
             'n/a': 'n/a',
             'Ready': 'ready',
+            'running': 'running',
             'Queued': 'queued',
             'finished': 'finished',
             'error': 'error',
