@@ -15,9 +15,6 @@ from MythTVArchiveServer.lib.recordedshows import Recordings
 from MythTVArchiveServer.lib.transcode import Quality
 
 
-registry.init_registry()
-
-
 class ArchiveServer(XMLRPC):
     """ Archive XMLRPC Server
     Used to add the MythTV recording to the Queue.
@@ -65,6 +62,7 @@ class ArchiveServer(XMLRPC):
 
 
 def twistd_plugin():
+    registry.init_registry()
     config = registry.site_registry().config
     reactor.listenTCP(config.server_port, Site(ArchiveServer()))
     reactor.run()

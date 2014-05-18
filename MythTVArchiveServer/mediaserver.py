@@ -18,9 +18,6 @@ from MythTVArchiveServer.resource.queue import QueueResource
 from MythTVArchiveServer.resource.recordings import RecordingsResource
 
 
-registry.init_registry(init_server=False)
-
-
 class DefaultResource(Resource):
     """
     Default Resource.
@@ -35,6 +32,8 @@ class DefaultResource(Resource):
 
 
 def media_plugin():
+
+    registry.init_registry(init_server=False)
 
     config = site_registry().config
 
