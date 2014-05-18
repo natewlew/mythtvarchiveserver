@@ -7,6 +7,7 @@
 
 import ConfigParser
 import os
+import json
 
 class ConfigError(Exception):
     pass
@@ -94,6 +95,17 @@ class ConfigController(object):
     @property
     def cleanup_on_error(self):
         return self.config.getboolean('archiveserver', 'cleanup_on_error')
+
+    @property
+    def delete_recording_on_finish(self):
+        return self.config.getboolean('archiveserver', 'delete_recording_on_finish')
+
+    @property
+    def commercial_cut_allowed_error_codes(self):
+        try:
+            return json.loads(self.config.get('archiveserver', 'commercial_cut_allowed_error_codes'))
+        except:
+            return []
 
     @property
     def export_type(self):

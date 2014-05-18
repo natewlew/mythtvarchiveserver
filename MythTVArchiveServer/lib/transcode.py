@@ -82,6 +82,7 @@ class Transcode(object):
 
     def __init__(self):
         self.log = site_registry().log
+        self.config = site_registry().config
 
     def transcode_process(self, cmd, recorder):
         transcode_process = TranscodeProcess(recorder)
@@ -99,8 +100,15 @@ class Transcode(object):
             self.log.info('Calling mythtranscode')
             command = [self.mythtranscode, '-i', file_, '-o', '%s.tmp' % file_, '--mpeg2', '--honorcutlist']
             yield self.transcode_process(command, recorder)
-        except Exception:
-            raise
+        except Exception, e:
+            try:
+                allowed_errors = self.config.commercial_cut_allowed_error_codes
+                if e.exitCode in allowed_errors:
+                    self.log.info('Continuing without cutting commercials')
+                else:
+                    raise e
+            except AttributeError:
+                raise e
         else:
             try:
                 self.log.debug('Overwriting original file')

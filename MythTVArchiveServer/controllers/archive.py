@@ -114,6 +114,12 @@ class ArchiveController(object):
         except Exception, e:
             raise ArchiveError('Error cleaning up file: %r' % e)
 
+        try:
+            if self.config.delete_recording_on_finish:
+                program.delete()
+        except Exception, e:
+            raise ArchiveError('Attempt to Delete Recording: %r' % e)
+
     def download_recording(self, program):
         """ Download Recording
         Download recording from the mythtv backend server.
