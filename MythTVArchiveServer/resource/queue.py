@@ -10,7 +10,7 @@ from datetime import datetime
 from MythTVArchiveServer.controllers.registry import site_registry
 from MythTVArchiveServer.models.queue import Queue
 from MythTVArchiveServer.util.webhelper import build_archive_link, build_paginate_links, default_template,\
-                                               process_archive, build_delete_link, process_delete
+                                               process_archive, build_delete_link, process_delete, default_params
 from MythTVArchiveServer.resource.base import BaseDB
 
 class QueueResource(BaseDB):
@@ -18,6 +18,8 @@ class QueueResource(BaseDB):
     Used to display the queue.
     """
     def custom_render(self, request):
+
+        _default_params = default_params(['page'], request.args)
 
         page = request.args.get('page', [0])[0]
         page, paginate_links = build_paginate_links(page, 'queue')
@@ -49,15 +51,17 @@ class QueueResource(BaseDB):
                     # Job Errored
                     status_msg = 'Error: %s' % status.message
                     row_css = ' style="background-color: #FFB2B2"'
-                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, page, 'queue')
+                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, 'queue',
+                                                    _default_params)
 
                 if starttime and endtime:
                     # Job Finished Successfully
                     runtime = endtime - starttime
                     status_msg = 'Job Time: %s' % runtime
                     row_css = ' style="background-color: #D4FFA9"'
-                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, page, 'queue')
-                    delete_link = build_delete_link(queue.chan_id, queue.start_time, page, 'recordings')
+                    retry_link = build_archive_link(queue.chan_id, queue.start_time, queue.quality, 'queue',
+                                                    _default_params)
+                    delete_link = build_delete_link(queue.chan_id, queue.start_time, 'recordings', _default_params)
 
             if status_msg is None and starttime is None:
                 # Hasn't Started Yet
