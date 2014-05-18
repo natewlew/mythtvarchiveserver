@@ -28,7 +28,7 @@ class Queue(Base):
         self.info = '%s - %s' % (program.title, program.subtitle)
 
     id = Column(Integer, primary_key=True)
-    chan_id = Column(Integer(10))
+    chan_id = Column(Integer())
     start_time = Column(DateTime)
     queued = Column(Boolean)
     info = Column(String(200))
